@@ -11,6 +11,7 @@ url_dados = 'https://balneabilidade.ima.sc.gov.br/relatorio/historico'
 url_list =[url_municipios, url_locais, url_anos, url_dados]
 
 anos = json.loads(requests.get(url_anos).text)
+anos = [i['ANO'] for i in anos]
 
 lugares = []
 dados = []
