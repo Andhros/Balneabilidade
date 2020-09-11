@@ -6,14 +6,17 @@ import json
 url_municipios = 'https://balneabilidade.ima.sc.gov.br/municipio/getMunicipios'
 url_locais = 'https://balneabilidade.ima.sc.gov.br/local/getLocaisByMunicipio'
 url_anos = 'https://balneabilidade.ima.sc.gov.br/registro/anosAnalisados'
+url_dados = 'https://balneabilidade.ima.sc.gov.br/relatorio/historico'
 
-url_list =[url_municipios, url_locais, url_anos]
+url_list =[url_municipios, url_locais, url_anos, url_dados]
 
+anos = json.loads(requests.get(url_anos).text)
 
-
-
+lugares = []
+dados = []
 for
-    req = pd.read_html(requests.post('https://balneabilidade.ima.sc.gov.br/relatorio/historico', 
+
+    req = pd.read_html(requests.post(url_dados, 
                             data={
         "municipioID": 2,
         "localID": 0,
@@ -47,4 +50,8 @@ for
 
     df = pd.concat(listdf)
     df.reset_index(drop=True, inplace=True)
+
+    lugares.append(locais)
+    dados.append(df)
+
 
