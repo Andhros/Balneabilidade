@@ -13,17 +13,21 @@ url_list =[url_municipios, url_locais, url_anos, url_dados]
 anos = json.loads(requests.get(url_anos).text)
 anos = [i['ANO'] for i in anos]
 
+req = pd.read_html(requests.post(url_dados,
+                                 data={
+                                     "municipioID": 2,
+                                     "localID": 0,
+                                     "ano": 2014,
+                                     "redirect": True
+                                 }).text)
+
+
 lugares = []
 dados = []
+
+
 for
 
-    req = pd.read_html(requests.post(url_dados, 
-                            data={
-        "municipioID": 2,
-        "localID": 0,
-        "ano": 2014,
-        "redirect": True
-    }).text)
 
     req.pop(0)
 
