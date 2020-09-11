@@ -11,6 +11,8 @@ url_list =[url_municipios, url_locais, url_anos]
 
 
 
+
+for
     req = pd.read_html(requests.post('https://balneabilidade.ima.sc.gov.br/relatorio/historico', 
                             data={
         "municipioID": 2,
