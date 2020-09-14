@@ -14,6 +14,7 @@ url_list =[url_municipios, url_locais, url_anos, url_dados]
 anos = json.loads(requests.get(url_anos).text)
 anos = [i['ANO'] for i in anos]
 
+print('Request Loop Started')
 ti = time.time()
 list_req = [requests.post(url_dados,
                           data={
@@ -25,24 +26,22 @@ list_req = [requests.post(url_dados,
 tf = time.time()
 print([i.status_code == 200 for i in list_req])
 print()
-print(tf-ti, 'seconds')
-
-req = pd.read_html(.text)
+print('Request Loop Finished in',tf-ti, 'seconds')
 
 
 lugares = []
 dados = []
 
 
-for i 
+for i in list_req: 
 
-    rawdata = .read_html(.text)
+    rawdata = pd.read_html(i.text)
 
-    req.pop(0)
+    rawdata.pop(0)
 
-    infodf = req[0:(len(req)+1):2]
+    infodf = rawdata[0:(len(rawdata)+1):2]
 
-    listdf = req[1:(len(req)+1):2]
+    listdf = rawdata[1:(len(rawdata)+1):2]
 
     infodf_new = []
     for i, j in zip (infodf, listdf):
