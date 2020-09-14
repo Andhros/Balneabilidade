@@ -36,7 +36,7 @@ dados = []
 
 for i 
 
-    pd.read_html(.text)
+    rawdata = .read_html(.text)
 
     req.pop(0)
 
