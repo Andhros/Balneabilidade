@@ -80,6 +80,8 @@ df = pd.concat(dados).reset_index(drop=True)
 
 df['Hora'].fillna('08:30:00', inplace=True)
 
+df.iloc[7077, 1] = '08:30:00'
+
 df['dateTime'] = pd.to_datetime(df.Data + ' ' + df.Hora)
 
 df.drop(columns=['Data', 'Hora'], inplace=True)
