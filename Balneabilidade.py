@@ -33,6 +33,9 @@ lugares = []
 dados = []
 
 
+print()
+print('For Loop Started')
+ti2 = time.time()
 for i in list_req: 
 
     rawdata = pd.read_html(i.text)
@@ -66,3 +69,17 @@ for i in list_req:
 
     lugares.append(locais)
     dados.append(df)
+tf2 = time.time()
+print()
+print('For Loop Finished in', tf2-ti2, 'seconds')
+
+spots = pd.concat(lugares).reset_index(drop=True)
+spots.drop_duplicates(subset='ponto', keep='first').reset_index(drop=True, inplace=True)
+
+df = pd.concat(dados).reset_index(drop=True)
+
+df['Hora'].fillna('08:30:00', inplace=True)
+
+df['dateTime'] = pd.to_datetime(df.Data + ' ' + df.Hora)
+
+df.drop(columns=['Data', 'Hora'], inplace=True)
