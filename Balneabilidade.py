@@ -85,3 +85,4 @@ df.iloc[7077, 1] = '08:30:00'
 df['dateTime'] = pd.to_datetime(df.Data + ' ' + df.Hora)
 
 df.drop(columns=['Data', 'Hora'], inplace=True)
+a = 1
