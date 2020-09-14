@@ -1,4 +1,5 @@
 import numpy as np
+import time
 import pandas as pd
 import requests
 import json
@@ -13,21 +14,29 @@ url_list =[url_municipios, url_locais, url_anos, url_dados]
 anos = json.loads(requests.get(url_anos).text)
 anos = [i['ANO'] for i in anos]
 
-req = pd.read_html(requests.post(url_dados,
-                                 data={
-                                     "municipioID": 2,
-                                     "localID": 0,
-                                     "ano": 2014,
-                                     "redirect": True
-                                 }).text)
+ti = time.time()
+list_req = [requests.post(url_dados,
+                          data={
+                              "municipioID": 2,
+                              "localID": 0,
+                              "ano": i,
+                              "redirect": True
+                          }) for i in anos]
+tf = time.time()
+print([i.status_code == 200 for i in list_req])
+print()
+print(tf-ti, 'seconds')
+
+req = pd.read_html(.text)
 
 
 lugares = []
 dados = []
 
 
-for
+for i 
 
+    pd.read_html(.text)
 
     req.pop(0)
 
