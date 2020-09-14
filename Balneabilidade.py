@@ -58,5 +58,3 @@ for
 
     lugares.append(locais)
     dados.append(df)
-
-
