@@ -118,6 +118,7 @@ df['Vento'] = df['Vento'].astype('category')
 df['Maré'] = df['Maré'].astype('category')
 df['Chuva'] = df['Chuva'].astype('category')
 
+<<<<<<< HEAD
 ['Vento',
  'Maré',
  'Chuva',
@@ -129,3 +130,10 @@ df['Chuva'] = df['Chuva'].astype('category')
  'dateTime']
 
 # Reorder columns
+=======
+# Reorder columns
+
+cols = ['dateTime', 'ponto', 'Vento', 'Maré', 'Chuva', 'Agua (Cº)', 'Ar (Cº)', 'E.Coli NMP*/100ml ', 'Condição']
+
+
+>>>>>>> c7c3d7a99a107f89d400cd96ccb6b46c4d46f5a8
