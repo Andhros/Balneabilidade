@@ -112,7 +112,7 @@ df['Ar (Cº)'] = df['Ar (Cº)'].apply(lambda x: x.replace('Cº', ''))
 df['Ar (Cº)'] = df['Ar (Cº)'].apply(lambda x: np.nan if isinstance(x, str) and (x.isspace() or not x) else x)
 df['Ar (Cº)'] = df['Ar (Cº)'].astype('float')
 
-df['ponto'] = df['ponto'].astype('category')
+df['ponto'] = df['ponto'].astype('int')
 df['Condição'] = df['Condição'].astype('category')
 df['Vento'] = df['Vento'].astype('category')
 df['Maré'] = df['Maré'].astype('category')
@@ -124,3 +124,5 @@ cols = ['dateTime', 'ponto', 'Vento', 'Maré', 'Chuva', 'Agua (Cº)', 'Ar (Cº)'
 df = df[cols]
 
 features = pd.read_excel('features_pontos.xlsx')
+
+
