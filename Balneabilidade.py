@@ -78,8 +78,9 @@ spots.drop_duplicates(subset='ponto', keep='first').reset_index(drop=True, inpla
 
 df = pd.concat(dados).reset_index(drop=True)
 
-
 mean_hour = df[df['Hora'].notnull()]
+
+mean_hour.iloc[7077, 1] = '08:30:00'
 
 import functools
 import operator
@@ -93,11 +94,11 @@ def avg_datetime(series):
     
 mean_h = avg_datetime(mean_hour['Hora'])
 
+df['Hora'].fillna('09:41:46', inplace=True)
 
-df['Hora'].fillna('08:30:00', inplace=True)
-
-df.iloc[7077, 1] = '08:30:00'
+df.iloc[7077, 1] = '09:41:46'
 
 df['dateTime'] = pd.to_datetime(df.Data + ' ' + df.Hora)
 
 df.drop(columns=['Data', 'Hora'], inplace=True)
+
