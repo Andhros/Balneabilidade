@@ -102,3 +102,4 @@ df['dateTime'] = pd.to_datetime(df.Data + ' ' + df.Hora)
 
 df.drop(columns=['Data', 'Hora'], inplace=True)
 
+df['Agua (Cº)'].apply(lambda x: x.replace(' Cº', ''))
