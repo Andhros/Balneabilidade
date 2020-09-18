@@ -120,6 +120,7 @@ df['Chuva'] = df['Chuva'].astype('category')
 
 # Reorder columns
 
-cols = ['dateTime', 'ponto', 'Vento', 'Maré', 'Chuva', 'Agua (Cº)', 'Ar (Cº)', 'E.Coli NMP*/100ml ', 'Condição']
+cols = ['dateTime', 'ponto', 'Vento', 'Maré', 'Chuva', 'Agua (Cº)', 'Ar (Cº)', 'E.Coli NMP*/100ml', 'Condição']
+df = df[cols]
 
-
+features = pd.read_excel('features_pontos.xlsx')
