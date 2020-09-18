@@ -3,6 +3,9 @@ import time
 import pandas as pd
 import requests
 import json
+import functools
+import operator
+
 
 url_municipios = 'https://balneabilidade.ima.sc.gov.br/municipio/getMunicipios'
 url_locais = 'https://balneabilidade.ima.sc.gov.br/local/getLocaisByMunicipio'
@@ -81,9 +84,6 @@ df = pd.concat(dados).reset_index(drop=True)
 mean_hour = df[df['Hora'].notnull()]
 
 mean_hour.iloc[7077, 1] = '08:30:00'
-
-import functools
-import operator
 
 mean_hour['Hora'] = pd.to_datetime(mean_hour['Hora'])
 
