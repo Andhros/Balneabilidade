@@ -121,5 +121,10 @@ df['Chuva'] = df['Chuva'].astype('category')
 # Reorder columns
 
 cols = ['dateTime', 'ponto', 'Vento', 'Maré', 'Chuva', 'Agua (Cº)', 'Ar (Cº)', 'E.Coli NMP*/100ml', 'Condição']
+df = df[cols]
 
 features_pontos = pd.read_excel('features_pontos.xlsx')
+
+df = df.merge(features_pontos, left_on='ponto', right_on='id')
+
+df.to_csv('df.csv', sep=';')
