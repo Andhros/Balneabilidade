@@ -102,6 +102,6 @@ df['dateTime'] = pd.to_datetime(df.Data + ' ' + df.Hora)
 
 df.drop(columns=['Data', 'Hora'], inplace=True)
 
-df['Agua (Cº)'].replace(' Cº', '')
-df['Agua (Cº)'].replace('', np.nan)
+df['Agua (Cº)'] = df['Agua (Cº)'].apply(lambda x: x.replace(' Cº', ''))
+df['Agua (Cº)'] = df['Agua (Cº)'].apply(lambda x: np.nan if isinstance(x, str) and (x.isspace() or not x) else x)
 df['Agua (Cº)'].astype('float')
