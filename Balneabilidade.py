@@ -77,7 +77,7 @@ print()
 print('For Loop Finished in', tf2-ti2, 'seconds')
 
 spots = pd.concat(lugares).reset_index(drop=True)
-spots.drop_duplicates(subset='ponto', keep='first').reset_index(drop=True, inplace=True)
+spots = spots.drop_duplicates(subset='ponto', keep='first').reset_index(drop=True)
 
 df = pd.concat(dados).reset_index(drop=True)
 
@@ -102,4 +102,6 @@ df['dateTime'] = pd.to_datetime(df.Data + ' ' + df.Hora)
 
 df.drop(columns=['Data', 'Hora'], inplace=True)
 
-df['Agua (Cº)'].apply(lambda x: x.replace(' Cº', ''))
+df['Agua (Cº)'].replace(' Cº', '')
+df['Agua (Cº)'].replace('', np.nan)
+df['Agua (Cº)'].astype('float')
