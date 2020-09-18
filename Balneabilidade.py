@@ -126,4 +126,6 @@ features_pontos = pd.read_excel('features_pontos.xlsx')
 
 df = df.merge(features_pontos, left_on='ponto', right_on='id')
 
+df.drop(columns=['id'], inplace=True)
+
 df.to_csv('df.csv', sep=';')
