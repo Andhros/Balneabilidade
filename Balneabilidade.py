@@ -131,15 +131,12 @@ df.drop(columns=['Data', 'Hora'], inplace=True)
 
 # the columns with air and wates temperatures contain symbols that need to be removed
 # removes the symbols and tranforms the columns into type float
-df['Agua (Cº)'] = df['Agua (Cº)'].apply(lambda x: x.replace(' Cº', ''))
-df['Agua (Cº)'] = df['Agua (Cº)'].apply(lambda x: x.replace('Cº', ''))
-df['Agua (Cº)'] = df['Agua (Cº)'].apply(lambda x: np.nan if isinstance(x, str) and (x.isspace() or not x) else x)
-df['Agua (Cº)'] = df['Agua (Cº)'].astype('float')
+def transform_colT(coluna):
+    df[coluna] = df[coluna].apply(lambda x: x.replace(' Cº', ''))
+    df[coluna] = df[coluna].apply(lambda x: x.replace('Cº', ''))
+    df[coluna] = df[coluna].apply(lambda x: np.nan if isinstance(x, str) and (x.isspace() or not x) else x)
+    df[coluna] = df[coluna].astype('float')
 
-df['Ar (Cº)'] = df['Ar (Cº)'].apply(lambda x: x.replace(' Cº', ''))
-df['Ar (Cº)'] = df['Ar (Cº)'].apply(lambda x: x.replace('Cº', ''))
-df['Ar (Cº)'] = df['Ar (Cº)'].apply(lambda x: np.nan if isinstance(x, str) and (x.isspace() or not x) else x)
-df['Ar (Cº)'] = df['Ar (Cº)'].astype('float')
 
 # converts the rest of the columns to the right types
 df['ponto'] = df['ponto'].astype('int')
@@ -149,7 +146,7 @@ df['Maré'] = df['Maré'].astype('category')
 df['Chuva'] = df['Chuva'].astype('category')
 
 # Reorder columns
-cols = ['dateTime', 'ponto', 'Vento', 'Maré', 'Chuva', 'Agua (Cº)', 'Ar (Cº)', 'E.Coli NMP*/100ml', 'Condição']
+cols = ['dateTime', 'ponto', 'Vento', 'Maré', 'Chuva', coluna, 'Ar (Cº)', 'E.Coli NMP*/100ml', 'Condição']
 df = df[cols]
 
 # some features of each point of monitoring were gathered manually
