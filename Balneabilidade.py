@@ -149,7 +149,7 @@ df['Maré'] = df['Maré'].astype('category')
 df['Chuva'] = df['Chuva'].astype('category')
 
 # Reorder columns
-cols = ['dateTime', 'ponto', 'Vento', 'Maré', 'Chuva', coluna, 'Ar (Cº)', 'E.Coli NMP*/100ml', 'Condição']
+cols = ['dateTime', 'ponto', 'Vento', 'Maré', 'Chuva', 'Agua (Cº)', 'Ar (Cº)', 'E.Coli NMP*/100ml', 'Condição']
 df = df[cols]
 
 # some features of each point of monitoring were gathered manually
