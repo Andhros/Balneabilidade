@@ -136,7 +136,10 @@ def transform_colT(coluna):
     df[coluna] = df[coluna].apply(lambda x: x.replace('Cº', ''))
     df[coluna] = df[coluna].apply(lambda x: np.nan if isinstance(x, str) and (x.isspace() or not x) else x)
     df[coluna] = df[coluna].astype('float')
+    return df[coluna]
 
+df['Agua (Cº)'] = transform_colT('Agua (Cº)')
+df['Ar (Cº)'] = transform_colT('Ar (Cº)')
 
 # converts the rest of the columns to the right types
 df['ponto'] = df['ponto'].astype('int')
