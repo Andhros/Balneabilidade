@@ -23,3 +23,4 @@ mapa_media_ponto = px.scatter_mapbox(
 e_coli_ponto_year = df.groupby(['ponto', df.dateTime.dt.year, 'agua_doce', 'desembocadura_praia', 'ponto_perto_desembocadura', 
                                 'lat', 'long'], as_index=True)['e_coli'].mean().reset_index()
 
+ 
