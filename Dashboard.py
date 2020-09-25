@@ -23,7 +23,8 @@ mapa_media_ponto = px.scatter_mapbox(
 e_coli_ponto_year = df.groupby(['ponto', df.dateTime.dt.year, 'agua_doce', 'desembocadura_praia', 'ponto_perto_desembocadura', 
                                 'lat', 'long'], as_index=True)['e_coli'].mean().reset_index()
 
-<<<<<<< HEAD
+lineplot = px.scatter(e_coli_ponto, x='dateTime', y='e_coli', hover_data=['ponto'], color='ponto')
+
 years = df.dateTime.dt.year.unique()
 pontos = df.ponto.unique()
 
@@ -76,9 +77,3 @@ app.layout = html.Div([
 
 if __name__ == '__main__':
     app.run_server(debug=True)
-=======
-
-lineplot = px.scatter(e_coli_ponto, x='dateTime', y='e_coli', hover_data=['ponto'], color='ponto')
-
- 
->>>>>>> b9c5e0b5f4e970a2cc421afdcdb6f3b24dae8139
