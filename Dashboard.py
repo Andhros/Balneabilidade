@@ -24,6 +24,6 @@ e_coli_ponto_year = df.groupby(['ponto', df.dateTime.dt.year, 'agua_doce', 'dese
                                 'lat', 'long'], as_index=True)['e_coli'].mean().reset_index()
 
 
-lineplot = px.scatter(e_coli_ponto, x='dateTime', y='e_coli', hover_data=['ponto'], color='ponto')
+lineplot = px.scatter(e_coli_ponto_year, x='dateTime', y='e_coli', hover_data=['ponto'], color='ponto')
 
  
