@@ -23,4 +23,55 @@ mapa_media_ponto = px.scatter_mapbox(
 e_coli_ponto_year = df.groupby(['ponto', df.dateTime.dt.year, 'agua_doce', 'desembocadura_praia', 'ponto_perto_desembocadura', 
                                 'lat', 'long'], as_index=True)['e_coli'].mean().reset_index()
 
- 
+years = df.dateTime.dt.year.unique()
+pontos = df.ponto.unique()
+
+#-----------------------------------------------------------------------------
+### Dashboard
+
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+from dash.dependencies import Input, Output
+
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets) 
+
+app.layout = html.Div([
+    html.Div([
+        html.H1(
+            children='Análise de balneabilidade | Florianópolis - SC',
+            style={
+                'textAlign' : 'center',
+            }
+        )
+    ]),
+    
+    html.Div([
+        html.Div([
+            dcc.Markdown('''#### Selecione o ano:'''),
+            dcc.Dropdown(
+                id='drop_year',
+                options=[{'label': i, 'value': i} for i in years],
+                value='Todos os anos'
+            ),
+        ], className='one-third column'),
+        html.Div([
+            dcc.Graph(
+            id='mapa',
+            figure=mapa_media_ponto
+            )   
+        ], className='two-thirds column'),
+    ], className='row'),
+    
+    html.Div([
+        dcc.Graph(
+            id='mapa_pontos',
+            figure=mapa_media_ponto
+        )
+    ])
+
+])
+
+if __name__ == '__main__':
+    app.run_server(debug=True)
