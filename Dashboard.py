@@ -17,10 +17,13 @@ e_coli_ponto = df.groupby(['ponto', 'agua_doce', 'desembocadura_praia', 'ponto_p
 # creates a map with the mean of e coli per point
 mapa_media_ponto = px.scatter_mapbox(
     e_coli_ponto, lat='lat', lon='long', hover_data=['ponto', 'agua_doce', 'desembocadura_praia', 'ponto_perto_desembocadura'], 
-    size='e_coli', color='e_coli', mapbox_style='carto-positron', center={"lat": -27.61587, "lon": -48.48378}, zoom=8)
+    size='e_coli', color='e_coli', mapbox_style='carto-positron', center={"lat": -27.61587, "lon": -48.48378}, zoom=9)
 
 # groups the data by point and takes the e coli mean for  each year of the historical series of each point
 e_coli_ponto_year = df.groupby(['ponto', df.dateTime.dt.year, 'agua_doce', 'desembocadura_praia', 'ponto_perto_desembocadura', 
                                 'lat', 'long'], as_index=True)['e_coli'].mean().reset_index()
+
+
+lineplot = px.scatter(e_coli_ponto, x='dateTime', y='e_coli', hover_data=['ponto'], color='ponto')
 
  
