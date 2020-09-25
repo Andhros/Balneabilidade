@@ -61,19 +61,26 @@ app.layout = html.Div([
         html.Div([
             dcc.Graph(
             id='mapa',
-            figure=mapa_media_ponto
             )   
         ], className='two-thirds column'),
     ], className='row'),
-    
-    html.Div([
-        dcc.Graph(
-            id='mapa_pontos',
-            figure=mapa_media_ponto
-        )
-    ])
 
 ])
+
+@app.callback(
+    Output('mapa', 'figure'),
+    [Input('drop_year', 'value')]
+)
+
+def update_graph(year):
+    filtered_df = e_coli_ponto_year[e_coli_ponto_year.dateTime == year]
+    
+    mapa = px.scatter_mapbox(
+        filtered_df, lat='lat', lon='long', hover_data=['ponto', 'agua_doce', 'desembocadura_praia', 'ponto_perto_desembocadura'],
+        size='e_coli', color='e_coli', mapbox_style='carto-positron', center={"lat": -27.61587, "lon": -48.48378}, zoom=9)
+
+    mapa.update_layout(transition_duration=500)
+    return mapa
 
 if __name__ == '__main__':
     app.run_server(debug=True)
