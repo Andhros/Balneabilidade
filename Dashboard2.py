@@ -65,6 +65,7 @@ app.layout = html.Div([
                 id='drop_ponto2',
                 options=[{'label': i, 'value': i} for i in pontos],
             ),
+            dcc.Graph(id='graph2')
         ], className='six columns'),
     ]),
 
@@ -74,17 +75,27 @@ app.layout = html.Div([
     Output('graph1', 'figure'),
     [Input('drop_ponto1', 'value')]
 )
+
 def update_graph(pointN):
     filtered_df = df[df.ponto == pointN]
 
-    graph = ff.create_distplot(
-        [filtered_df['e_coli'].dropna().values], group_labels=['e_coli'])
-    
-    graph1 = px.histogram(filtered_df['e_coli'], x="e_coli", marginal="rug",
+    graph1 = px.histogram(filtered_df, x="e_coli", marginal="rug",
                  hover_data=df.columns)
 
-        
-    return graph1.show()
+    return graph1
+
+@app.callback(
+    Output('graph2', 'figure'),
+    [Input('drop_ponto2', 'value')]
+)
+
+def update_graph2(pointN2):
+    filtered_df = df[df.ponto == pointN2]
+
+    graph2 = px.histogram(filtered_df, x="e_coli", marginal="rug",
+                 hover_data=df.columns)
+
+    return graph2
 
 if __name__ == '__main__':
     app.run_server(debug=True)
