@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import plotly.express as px
+import plotly.figure_factory as ff
 
 # reads the csv and parses the dateTime column
 df = pd.read_csv('df.csv', sep=';', index_col=0, parse_dates=['dateTime'])
@@ -15,6 +16,13 @@ features_pontos = pd.read_excel('features_pontos.xlsx')
 mapa = px.scatter_mapbox(
     features_pontos, lat='lat', lon='long', hover_data=['id', 'nome', 'referencia', 'localizacao', 'agua_doce', 'desembocadura_praia', 'ponto_perto_desembocadura'], 
     mapbox_style='carto-positron', center={"lat": -27.61587, "lon": -48.48378}, zoom=8)
+
+# groups the data by point and takes the e coli mean for  each year of the historical series of each point
+e_coli_ponto_year = df.groupby(['ponto', df.dateTime.dt.year, 'agua_doce', 'desembocadura_praia', 'ponto_perto_desembocadura',
+                                'lat', 'long'], as_index=True)['e_coli'].mean().reset_index()
+
+px.scatter(e_coli_ponto_year, x='dateTime', y='e_coli',
+           hover_data=['ponto'], color='ponto')
 
 years = df.dateTime.dt.year.unique()
 pontos = df.ponto.sort_values().unique()
@@ -37,33 +45,48 @@ app.layout = html.Div([
             style={
                 'textAlign' : 'center',
             }
-        )
+        ),
+        dcc.Graph(id='mapa1', figure=mapa)
     ]),
     
     html.Div([
         html.Div([
-            dcc.Markdown('''###### Mapa 1'''),
-            dcc.Graph(id='mapa1', figure=mapa),
             dcc.Markdown('''###### Selecione um ponto'''), 
             dcc.Dropdown(
                 id='drop_ponto1',
                 options=[{'label': i, 'value': i} for i in pontos],
                 value=''
-            )
+            ),
+            dcc.Graph(id='graph1')
         ], className='six columns'),
         html.Div([
-            dcc.Markdown('''###### Mapa 2'''),
-            dcc.Graph(id='mapa2', figure=mapa),
             dcc.Markdown('''###### Selecione um ponto'''), 
             dcc.Dropdown(
                 id='drop_ponto2',
                 options=[{'label': i, 'value': i} for i in pontos],
-                value=''
-            )  
+            ),
         ], className='six columns'),
     ]),
 
 ])
 
+@app.callback(
+    Output('graph1', 'figure'),
+    [Input('drop_ponto1', 'value')]
+)
+def update_graph(pointN):
+    filtered_df = df[df.ponto == pointN]
+
+    graph = ff.create_distplot(
+        [filtered_df['e_coli'].dropna().values], group_labels=['e_coli'])
+    
+    graph1 = px.histogram(filtered_df['e_coli'], x="e_coli", marginal="rug",
+                 hover_data=df.columns)
+
+        
+    return graph1.show()
+
 if __name__ == '__main__':
     app.run_server(debug=True)
+
+
