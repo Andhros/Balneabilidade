@@ -77,9 +77,9 @@ app.layout = html.Div([
     [Input('drop_ponto1', 'value')]
 )
 
-def update_graph(pointN):
+def update_graph(*pointN):
     
-    filtered_df = df[(df['ponto'].isin([pointN]))]
+    filtered_df = df[df['ponto'].isin(list(pointN))]
 
     graph1 = px.histogram(filtered_df, x="e_coli", color='ponto', marginal="rug")
 
