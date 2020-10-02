@@ -51,11 +51,12 @@ app.layout = html.Div([
     
     html.Div([
         html.Div([
-            dcc.Markdown('''###### Selecione um ponto'''), 
+            dcc.Markdown('''###### Selecione dois ponto'''), 
             dcc.Dropdown(
                 id='drop_ponto1',
                 options=[{'label': i, 'value': i} for i in pontos],
-                value=''
+                value='',
+                multi=True
             ),
             dcc.Graph(id='graph1')
         ], className='six columns'),
@@ -77,25 +78,25 @@ app.layout = html.Div([
 )
 
 def update_graph(pointN):
-    filtered_df = df[df.ponto == pointN]
+    
+    filtered_df = df[(df['ponto'].isin([pointN]))]
 
-    graph1 = px.histogram(filtered_df, x="e_coli", marginal="rug",
-                 hover_data=df.columns)
+    graph1 = px.histogram(filtered_df, x="e_coli", color='ponto', marginal="rug")
 
     return graph1
 
-@app.callback(
-    Output('graph2', 'figure'),
-    [Input('drop_ponto2', 'value')]
-)
+# @app.callback(
+#     Output('graph2', 'figure'),
+#     [Input('drop_ponto2', 'value')]
+# )
 
-def update_graph2(pointN2):
-    filtered_df = df[df.ponto == pointN2]
+# def update_graph2(pointN2):
+#     filtered_df = df[df.ponto == pointN2]
 
-    graph2 = px.histogram(filtered_df, x="e_coli", marginal="rug",
-                 hover_data=df.columns)
+#     graph2 = px.histogram(filtered_df, x="e_coli", marginal="rug",
+#                  hover_data=df.columns)
 
-    return graph2
+#     return graph2
 
 if __name__ == '__main__':
     app.run_server(debug=True)
