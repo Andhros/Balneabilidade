@@ -51,12 +51,11 @@ app.layout = html.Div([
     
     html.Div([
         html.Div([
-            dcc.Markdown('''###### Selecione dois ponto'''), 
+            dcc.Markdown('''###### Selecione dois pontos'''), 
             dcc.Dropdown(
                 id='drop_ponto1',
                 options=[{'label': i, 'value': i} for i in pontos],
-                value='',
-                multi=True
+                multi=True,
             ),
             dcc.Graph(id='graph1')
         ], className='six columns'),
@@ -73,17 +72,25 @@ app.layout = html.Div([
 ])
 
 @app.callback(
-    Output('graph1', 'figure'),
-    [Input('drop_ponto1', 'value')]
+    dash.dependencies.Output('graph1', 'figure'),
+    [dash.dependencies.Input('drop_ponto1', 'value')]
 )
 
-def update_graph(*pointN):
-    
-    filtered_df = df[df['ponto'].isin(list(pointN))]
+def update_graph(pointN):
+    if pointN is None or []:
+        
+        filtered_df = df
+        
+        graph1 = px.histogram(filtered_df, x="e_coli", marginal="rug")
+        
+        return graph1
+        
+    else:
+        filtered_df = df[df['ponto'].isin(pointN)]
 
-    graph1 = px.histogram(filtered_df, x="e_coli", color='ponto', marginal="rug")
+        graph1 = px.histogram(filtered_df, x="e_coli", color='ponto', marginal="rug")
 
-    return graph1
+        return graph1
 
 # @app.callback(
 #     Output('graph2', 'figure'),
