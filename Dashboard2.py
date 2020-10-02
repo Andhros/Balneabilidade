@@ -60,11 +60,11 @@ app.layout = html.Div([
             dcc.Graph(id='graph1')
         ], className='six columns'),
         html.Div([
-            dcc.Markdown('''###### Selecione um ponto'''), 
-            dcc.Dropdown(
-                id='drop_ponto2',
-                options=[{'label': i, 'value': i} for i in pontos],
-            ),
+            # dcc.Markdown('''###### Selecione um ponto'''), 
+            # dcc.Dropdown(
+            #     id='drop_ponto2',
+            #     options=[{'label': i, 'value': i} for i in pontos],
+            # ),
             dcc.Graph(id='graph2')
         ], className='six columns'),
     ]),
@@ -72,25 +72,30 @@ app.layout = html.Div([
 ])
 
 @app.callback(
-    dash.dependencies.Output('graph1', 'figure'),
+    [dash.dependencies.Output('graph1', 'figure'),
+    dash.dependencies.Output('graph2', 'figure')],
     [dash.dependencies.Input('drop_ponto1', 'value')]
 )
 
 def update_graph(pointN):
-    if pointN is None or []:
+    if pointN is None:
         
-        filtered_df = df
+        filtered_df = df.sort_values(by=['ponto', 'dateTime'])
         
         graph1 = px.histogram(filtered_df, x="e_coli", marginal="rug")
         
-        return graph1
+        graph2 = px.line(filtered_df, x='dateTime', y='e_coli')
+        
+        return graph1, graph2
         
     else:
-        filtered_df = df[df['ponto'].isin(pointN)]
+        filtered_df = df[df['ponto'].isin(pointN)].sort_values(by=['ponto', 'dateTime'])
 
         graph1 = px.histogram(filtered_df, x="e_coli", color='ponto', marginal="rug")
+        
+        graph2 = px.line(filtered_df, x='dateTime', y='e_coli')
 
-        return graph1
+        return graph1, graph2
 
 # @app.callback(
 #     Output('graph2', 'figure'),
