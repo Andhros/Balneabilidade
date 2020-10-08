@@ -67,7 +67,8 @@ app.layout = html.Div([
                 options=[{'label': i, 'value': i} for i in pontos],
             ),
             dcc.Graph(id='graph2'),
-            dcc.Graph(id='graph4')
+            dcc.Graph(id='graph4'),
+            dcc.Graph(id='graph6')
         ], className='six columns'),
     ]),
 
@@ -100,7 +101,8 @@ def update_graph(pointN):
 
 @app.callback(
     [dash.dependencies.Output('graph2', 'figure'),
-    dash.dependencies.Output('graph4', 'figure')],
+    dash.dependencies.Output('graph4', 'figure'),
+    dash.dependencies.Output('graph6', 'figure')],
     [Input('drop_ponto2', 'value')]
 )
 
@@ -111,8 +113,16 @@ def update_graph2(pointN2):
                           histnorm='percent', range_x=[0, 25000], nbins=25)
     
     graph4 = px.line(filtered_df1, x='dateTime', y='e_coli', hover_data=df.columns)
+    
+    crosstab_rain = pd.DataFrame(
+        pd.crosstab(filtered_df1.chuva, filtered_df1.ponto, values=filtered_df1.e_coli, aggfunc='mean').round(0).to_dict()
+        )
+    crosstab_rain = crosstab_rain.reset_index()
+    crosstab_rain = crosstab_rain.rename(columns={'index':'chuva', pointN2:'e_coli_mean'})
+    
+    graph6 = px.bar(data_frame=crosstab_rain, x='chuva', y='e_coli_mean', color='chuva')
 
-    return graph2, graph4
+    return graph2, graph4, graph6
 
 if __name__ == '__main__':
     app.run_server(debug=True)
