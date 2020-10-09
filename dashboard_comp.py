@@ -58,7 +58,8 @@ app.layout = html.Div([
             ),
             dcc.Graph(id='graph1'),
             dcc.Graph(id='graph3'),
-            dcc.Graph(id='graph5')
+            dcc.Graph(id='graph5'),
+            dcc.Graph(id='graph7')
         ], className='six columns'),
         html.Div([
             dcc.Markdown('''###### Selecione um ponto'''), 
@@ -68,7 +69,8 @@ app.layout = html.Div([
             ),
             dcc.Graph(id='graph2'),
             dcc.Graph(id='graph4'),
-            dcc.Graph(id='graph6')
+            dcc.Graph(id='graph6'),
+            dcc.Graph(id='graph8')
         ], className='six columns'),
     ]),
 
@@ -77,7 +79,8 @@ app.layout = html.Div([
 @app.callback(
     [dash.dependencies.Output('graph1', 'figure'),
     dash.dependencies.Output('graph3', 'figure'),
-    dash.dependencies.Output('graph5', 'figure')],
+    dash.dependencies.Output('graph5', 'figure'),
+    dash.dependencies.Output('graph7', 'figure')],
     [dash.dependencies.Input('drop_ponto1', 'value')]
 )
 
@@ -86,8 +89,10 @@ def update_graph(pointN):
         
     graph1 = px.histogram(filtered_df, x="e_coli", marginal="rug",
                           histnorm='percent', range_x=[0, 25000], nbins=25)
+    
+    graph3 = px.box(filtered_df, y='e_coli')
         
-    graph3 = px.line(filtered_df, x='dateTime', y='e_coli', hover_data=df.columns)
+    graph5 = px.line(filtered_df, x='dateTime', y='e_coli', hover_data=df.columns)
     
     crosstab_rain = pd.DataFrame(
         pd.crosstab(filtered_df.chuva, filtered_df.ponto, values=filtered_df.e_coli, aggfunc='mean').round(0).to_dict()
@@ -95,14 +100,15 @@ def update_graph(pointN):
     crosstab_rain = crosstab_rain.reset_index()
     crosstab_rain = crosstab_rain.rename(columns={'index':'chuva', pointN:'e_coli_mean'})
     
-    graph5 = px.bar(data_frame=crosstab_rain, x='chuva', y='e_coli_mean', color='chuva')
+    graph7 = px.bar(data_frame=crosstab_rain, x='chuva', y='e_coli_mean', color='chuva')
         
-    return graph1, graph3, graph5
+    return graph1, graph3, graph5, graph7
 
 @app.callback(
     [dash.dependencies.Output('graph2', 'figure'),
     dash.dependencies.Output('graph4', 'figure'),
-    dash.dependencies.Output('graph6', 'figure')],
+    dash.dependencies.Output('graph6', 'figure'),
+    dash.dependencies.Output('graph8', 'figure')],
     [Input('drop_ponto2', 'value')]
 )
 
@@ -112,7 +118,9 @@ def update_graph2(pointN2):
     graph2 = px.histogram(filtered_df1, x="e_coli", marginal="rug",
                           histnorm='percent', range_x=[0, 25000], nbins=25)
     
-    graph4 = px.line(filtered_df1, x='dateTime', y='e_coli', hover_data=df.columns)
+    graph4 = px.box(filtered_df1, y='e_coli')
+    
+    graph6 = px.line(filtered_df1, x='dateTime', y='e_coli', hover_data=df.columns)
     
     crosstab_rain = pd.DataFrame(
         pd.crosstab(filtered_df1.chuva, filtered_df1.ponto, values=filtered_df1.e_coli, aggfunc='mean').round(0).to_dict()
@@ -120,9 +128,9 @@ def update_graph2(pointN2):
     crosstab_rain = crosstab_rain.reset_index()
     crosstab_rain = crosstab_rain.rename(columns={'index':'chuva', pointN2:'e_coli_mean'})
     
-    graph6 = px.bar(data_frame=crosstab_rain, x='chuva', y='e_coli_mean', color='chuva')
+    graph8 = px.bar(data_frame=crosstab_rain, x='chuva', y='e_coli_mean', color='chuva')
 
-    return graph2, graph4, graph6
+    return graph2, graph4, graph6, graph8
 
 if __name__ == '__main__':
     app.run_server(debug=True)
