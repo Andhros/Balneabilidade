@@ -98,7 +98,7 @@ def update_graph(pointN):
         pd.crosstab(filtered_df.chuva, filtered_df.ponto, values=filtered_df.e_coli, aggfunc='mean').round(0).to_dict()
         )
     crosstab_rain = crosstab_rain.reset_index()
-    crosstab_rain = crosstab_rain.rename(columns={'index':'chuva', pointN:'e_coli_mean'})
+    crosstab_rain.rename(columns={'index':'chuva', pointN:'e_coli_mean'}, inplace=True)
     
     graph7 = px.bar(data_frame=crosstab_rain, x='chuva', y='e_coli_mean', color='chuva')
         
@@ -126,7 +126,7 @@ def update_graph2(pointN2):
         pd.crosstab(filtered_df1.chuva, filtered_df1.ponto, values=filtered_df1.e_coli, aggfunc='mean').round(0).to_dict()
         )
     crosstab_rain = crosstab_rain.reset_index()
-    crosstab_rain = crosstab_rain.rename(columns={'index':'chuva', pointN2:'e_coli_mean'})
+    crosstab_rain.rename(columns={'index':'chuva', pointN2:'e_coli_mean'}, inplace=True)
     
     graph8 = px.bar(data_frame=crosstab_rain, x='chuva', y='e_coli_mean', color='chuva')
 
