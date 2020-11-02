@@ -17,13 +17,6 @@ mapa = px.scatter_mapbox(
     features_pontos, lat='lat', lon='long', hover_data=['id', 'nome', 'referencia', 'localizacao', 'agua_doce', 'desembocadura_praia', 'ponto_perto_desembocadura'], 
     mapbox_style='carto-positron', center={"lat": -27.61587, "lon": -48.48378}, zoom=8)
 
-# groups the data by point and takes the e coli mean for  each year of the historical series of each point
-e_coli_ponto_year = df.groupby(['ponto', df.dateTime.dt.year, 'agua_doce', 'desembocadura_praia', 'ponto_perto_desembocadura',
-                                'lat', 'long'], as_index=True)['e_coli'].mean().reset_index()
-
-px.scatter(e_coli_ponto_year, x='dateTime', y='e_coli',
-           hover_data=['ponto'], color='ponto')
-
 years = df.dateTime.dt.year.unique()
 pontos = df.ponto.sort_values().unique()
 
@@ -94,17 +87,9 @@ def update_graph(pointN):
         
     graph5 = px.line(filtered_df, x='dateTime', y='e_coli', hover_data=df.columns)
     
-    #crosstab_rain = pd.DataFrame(
-        #pd.crosstab(filtered_df.chuva, filtered_df.ponto, values=filtered_df.e_coli, aggfunc='mean').round(0).to_dict()
-        #)
-    #crosstab_rain = crosstab_rain.reset_index()
-    #crosstab_rain.rename(columns={'index':'chuva', pointN:'e_coli_mean'}, inplace=True)
+    group_chuva = filtered_df.groupby('chuva', as_index=False)['e_coli'].mean()
     
-    #graph7 = px.bar(data_frame=crosstab_rain, x='chuva', y='e_coli_mean', color='chuva')
-    
-    grouped = filtered_df.groupby('chuva', as_index=False)['e_coli'].mean()
-    
-    graph7 = px.bar(data_frame=grouped, x='chuva', y='e_coli', color='chuva')
+    graph7 = px.bar(data_frame=group_chuva, x='chuva', y='e_coli', color='chuva')
         
     return graph1, graph3, graph5, graph7
 
@@ -125,18 +110,10 @@ def update_graph2(pointN2):
     graph4 = px.box(filtered_df1, y='e_coli')
     
     graph6 = px.line(filtered_df1, x='dateTime', y='e_coli', hover_data=df.columns)
-    
-    #crosstab_rain = pd.DataFrame(
-        #pd.crosstab(filtered_df1.chuva, filtered_df1.ponto, values=filtered_df1.e_coli, aggfunc='mean').round(0).to_dict()
-        #)
-    #crosstab_rain = crosstab_rain.reset_index()
-    #crosstab_rain.rename(columns={'index':'chuva', pointN2:'e_coli_mean'}, inplace=True)
-    
-    #graph8 = px.bar(data_frame=crosstab_rain, x='chuva', y='e_coli_mean', color='chuva')
 
-    grouped1 = filtered_df1.groupby('chuva', as_index=False)['e_coli'].mean()
+    group_chuva1 = filtered_df1.groupby('chuva', as_index=False)['e_coli'].mean()
     
-    graph8 = px.bar(data_frame=grouped1, x='chuva', y='e_coli', color='chuva')
+    graph8 = px.bar(data_frame=group_chuva1, x='chuva', y='e_coli', color='chuva')
 
     return graph2, graph4, graph6, graph8
 
