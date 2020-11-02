@@ -94,13 +94,17 @@ def update_graph(pointN):
         
     graph5 = px.line(filtered_df, x='dateTime', y='e_coli', hover_data=df.columns)
     
-    crosstab_rain = pd.DataFrame(
-        pd.crosstab(filtered_df.chuva, filtered_df.ponto, values=filtered_df.e_coli, aggfunc='mean').round(0).to_dict()
-        )
-    crosstab_rain = crosstab_rain.reset_index()
-    crosstab_rain.rename(columns={'index':'chuva', pointN:'e_coli_mean'}, inplace=True)
+    #crosstab_rain = pd.DataFrame(
+        #pd.crosstab(filtered_df.chuva, filtered_df.ponto, values=filtered_df.e_coli, aggfunc='mean').round(0).to_dict()
+        #)
+    #crosstab_rain = crosstab_rain.reset_index()
+    #crosstab_rain.rename(columns={'index':'chuva', pointN:'e_coli_mean'}, inplace=True)
     
-    graph7 = px.bar(data_frame=crosstab_rain, x='chuva', y='e_coli_mean', color='chuva')
+    #graph7 = px.bar(data_frame=crosstab_rain, x='chuva', y='e_coli_mean', color='chuva')
+    
+    grouped = filtered_df.groupby('chuva', as_index=False)['e_coli'].mean()
+    
+    graph7 = px.bar(data_frame=grouped, x='chuva', y='e_coli', color='chuva')
         
     return graph1, graph3, graph5, graph7
 
@@ -122,13 +126,17 @@ def update_graph2(pointN2):
     
     graph6 = px.line(filtered_df1, x='dateTime', y='e_coli', hover_data=df.columns)
     
-    crosstab_rain = pd.DataFrame(
-        pd.crosstab(filtered_df1.chuva, filtered_df1.ponto, values=filtered_df1.e_coli, aggfunc='mean').round(0).to_dict()
-        )
-    crosstab_rain = crosstab_rain.reset_index()
-    crosstab_rain.rename(columns={'index':'chuva', pointN2:'e_coli_mean'}, inplace=True)
+    #crosstab_rain = pd.DataFrame(
+        #pd.crosstab(filtered_df1.chuva, filtered_df1.ponto, values=filtered_df1.e_coli, aggfunc='mean').round(0).to_dict()
+        #)
+    #crosstab_rain = crosstab_rain.reset_index()
+    #crosstab_rain.rename(columns={'index':'chuva', pointN2:'e_coli_mean'}, inplace=True)
     
-    graph8 = px.bar(data_frame=crosstab_rain, x='chuva', y='e_coli_mean', color='chuva')
+    #graph8 = px.bar(data_frame=crosstab_rain, x='chuva', y='e_coli_mean', color='chuva')
+
+    grouped1 = filtered_df1.groupby('chuva', as_index=False)['e_coli'].mean()
+    
+    graph8 = px.bar(data_frame=grouped1, x='chuva', y='e_coli', color='chuva')
 
     return graph2, graph4, graph6, graph8
 
