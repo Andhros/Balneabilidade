@@ -89,7 +89,7 @@ def update_graph(pointN):
     
     group_chuva = filtered_df.groupby('chuva', as_index=False)['e_coli'].mean()
     
-    graph7 = px.bar(data_frame=group_chuva, x=group_chuva['chuva'], y='e_coli', color=group_chuva['chuva'])
+    graph7 = px.bar(data_frame=group_chuva, x='chuva', y='e_coli', color='chuva')
         
     return graph1, graph3, graph5, graph7
 
@@ -113,7 +113,7 @@ def update_graph2(pointN2):
 
     group_chuva1 = filtered_df1.groupby('chuva', as_index=False)['e_coli'].mean()
     
-    graph8 = px.bar(x=group_chuva1['chuva'], y=group_chuva1['e_coli'], color=group_chuva1['chuva'])
+    graph8 = px.bar(data_frame=group_chuva1, x='chuva', y='e_coli', color='chuva')
 
     return graph2, graph4, graph6, graph8
 
