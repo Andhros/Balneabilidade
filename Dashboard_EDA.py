@@ -17,8 +17,9 @@ mapa = px.scatter_mapbox(
     features_pontos, lat='lat', lon='long', hover_data=['id', 'nome', 'referencia', 'localizacao', 'agua_doce', 'desembocadura_praia', 'ponto_perto_desembocadura'], 
     mapbox_style='carto-positron', center={"lat": -27.61587, "lon": -48.48378}, zoom=8)
 
-years = df.dateTime.dt.year.unique()
-pontos = df.ponto.sort_values().unique()
+years = list(df.dateTime.dt.year.unique())
+years.append('Todos os anos')
+pontos = list(df.ponto.sort_values().unique())
 
 #-----------------------------------------------------------------------------
 ### Dashboard
@@ -49,10 +50,15 @@ app.layout = html.Div([
                 id='drop_ponto1',
                 options=[{'label': i, 'value': i} for i in pontos],
             ),
+            dcc.Markdown('''###### Selecione um ano'''),
+            dcc.Dropdown(
+                id='drop_years1',
+                options=[{'label': i, 'value': i} for i in years],
+                value='Todos os anos'
+            ),
             dcc.Graph(id='graph1'),
             dcc.Graph(id='graph3'),
             dcc.Graph(id='graph5'),
-            dcc.Graph(id='graph7')
         ], className='six columns'),
         html.Div([
             dcc.Markdown('''###### Selecione um ponto'''), 
@@ -60,10 +66,15 @@ app.layout = html.Div([
                 id='drop_ponto2',
                 options=[{'label': i, 'value': i} for i in pontos],
             ),
+            dcc.Markdown('''###### Selecione um ano'''),
+             dcc.Dropdown(
+                id='drop_years2',
+                options=[{'label': i, 'value': i} for i in years],
+                value='Todos os anos'
+            ),
             dcc.Graph(id='graph2'),
             dcc.Graph(id='graph4'),
             dcc.Graph(id='graph6'),
-            dcc.Graph(id='graph8')
         ], className='six columns'),
     ]),
 
@@ -72,13 +83,18 @@ app.layout = html.Div([
 @app.callback(
     [dash.dependencies.Output('graph1', 'figure'),
     dash.dependencies.Output('graph3', 'figure'),
-    dash.dependencies.Output('graph5', 'figure'),
-    dash.dependencies.Output('graph7', 'figure')],
-    [dash.dependencies.Input('drop_ponto1', 'value')]
+    dash.dependencies.Output('graph5', 'figure')],
+    [dash.dependencies.Input('drop_ponto1', 'value'),
+    dash.dependencies.Input('drop_years1', 'value')]
 )
 
-def update_graph(pointN):
-    filtered_df = df[df.ponto == pointN].sort_values(by='dateTime')
+def update_graph(pointN, yearsN):
+    
+    if yearsN == 'Todos os anos':
+        filtered_df = df[df.ponto == pointN].sort_values(by='dateTime')
+    
+    else:
+        filtered_df = df[(df.ponto == pointN) & (df.dateTime.dt.year == yearsN)].sort_values(by='dateTime')
         
     graph1 = px.histogram(filtered_df, x="e_coli", marginal="rug",
                           histnorm='percent', range_x=[0, 25000], nbins=25)
@@ -87,22 +103,23 @@ def update_graph(pointN):
         
     graph5 = px.line(filtered_df, x='dateTime', y='e_coli', hover_data=df.columns)
     
-    group_chuva = filtered_df.groupby('chuva', as_index=False)['e_coli'].mean()
-    
-    graph7 = px.bar(data_frame=group_chuva, x='chuva', y='e_coli', color='chuva')
         
-    return graph1, graph3, graph5, graph7
+    return graph1, graph3, graph5
 
 @app.callback(
     [dash.dependencies.Output('graph2', 'figure'),
     dash.dependencies.Output('graph4', 'figure'),
-    dash.dependencies.Output('graph6', 'figure'),
-    dash.dependencies.Output('graph8', 'figure')],
-    [dash.dependencies.Input('drop_ponto2', 'value')]
+    dash.dependencies.Output('graph6', 'figure')],
+    [dash.dependencies.Input('drop_ponto2', 'value'),
+    dash.dependencies.Input('drop_years2', 'value')]
 )
 
-def update_graph2(pointN2):
-    filtered_df1 = df[df.ponto == pointN2].sort_values(by='dateTime')
+def update_graph2(pointN2, yearsN2):
+    if yearsN2 == 'Todos os anos':
+        filtered_df1 = df[df.ponto == pointN2].sort_values(by='dateTime')
+    
+    else:
+        filtered_df1 = df[(df.ponto == pointN2) & (df.dateTime.dt.year == yearsN2)].sort_values(by='dateTime')
 
     graph2 = px.histogram(filtered_df1, x="e_coli", marginal="rug",
                           histnorm='percent', range_x=[0, 25000], nbins=25)
@@ -111,11 +128,7 @@ def update_graph2(pointN2):
     
     graph6 = px.line(filtered_df1, x='dateTime', y='e_coli', hover_data=df.columns)
 
-    group_chuva1 = filtered_df1.groupby('chuva', as_index=False)['e_coli'].mean()
-    
-    graph8 = px.bar(data_frame=group_chuva1, x='chuva', y='e_coli', color='chuva')
-
-    return graph2, graph4, graph6, graph8
+    return graph2, graph4, graph6
 
 if __name__ == '__main__':
     app.run_server(debug=True)
