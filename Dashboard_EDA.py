@@ -59,6 +59,7 @@ app.layout = html.Div([
             dcc.Graph(id='graph1'),
             dcc.Graph(id='graph3'),
             dcc.Graph(id='graph5'),
+            dcc.Graph(id='graph7'),
         ], className='six columns'),
         html.Div([
             dcc.Markdown('''###### Ponto de monitoramento'''), 
@@ -75,6 +76,7 @@ app.layout = html.Div([
             dcc.Graph(id='graph2'),
             dcc.Graph(id='graph4'),
             dcc.Graph(id='graph6'),
+            dcc.Graph(id='graph8'),
         ], className='six columns'),
     ]),
 
@@ -83,7 +85,8 @@ app.layout = html.Div([
 @app.callback(
     [dash.dependencies.Output('graph1', 'figure'),
     dash.dependencies.Output('graph3', 'figure'),
-    dash.dependencies.Output('graph5', 'figure')],
+    dash.dependencies.Output('graph5', 'figure'),
+    dash.dependencies.Output('graph7', 'figure')],
     [dash.dependencies.Input('drop_ponto1', 'value'),
     dash.dependencies.Input('drop_years1', 'value')]
 )
@@ -98,20 +101,23 @@ def update_graph(pointN, yearsN):
         
     graph1 = px.histogram(filtered_df, x="e_coli", marginal="rug",
                           histnorm='percent', range_x=[0, 25000], nbins=25, 
-                          title='Histograma - Porcentagem de medições x valores para E. Coli')
+                          title='Histogram - Porcentagem de medições x valores de E. Coli')
     
-    graph3 = px.box(filtered_df, y='e_coli', title='Box plot - Distribuição de valores de E. Coli')
+    graph3 = px.violin(filtered_df, y='e_coli', title='Violin Plot - Distribuição de valores de E. Coli')
+    
+    graph5 = px.box(filtered_df, y='e_coli', title='Box plot - Distribuição de valores de E. Coli')
         
-    graph5 = px.line(filtered_df, x='dateTime', y='e_coli', hover_data=df.columns,
-                     title='Série temporal de valores de E. Coli')
+    graph7 = px.line(filtered_df, x='dateTime', y='e_coli', hover_data=df.columns,
+                     title='Time Series - Valores de E. Coli')
     
         
-    return graph1, graph3, graph5
+    return graph1, graph3, graph5, graph7
 
 @app.callback(
     [dash.dependencies.Output('graph2', 'figure'),
     dash.dependencies.Output('graph4', 'figure'),
-    dash.dependencies.Output('graph6', 'figure')],
+    dash.dependencies.Output('graph6', 'figure'),
+    dash.dependencies.Output('graph8', 'figure')],
     [dash.dependencies.Input('drop_ponto2', 'value'),
     dash.dependencies.Input('drop_years2', 'value')]
 )
@@ -125,14 +131,16 @@ def update_graph2(pointN2, yearsN2):
 
     graph2 = px.histogram(filtered_df1, x="e_coli", marginal="rug",
                           histnorm='percent', range_x=[0, 25000], nbins=25,
-                          title='Histograma - Porcentagem de medições x valores para E. Coli')
+                          title='Histogram - Porcentagem de medições x valores de E. Coli')
     
-    graph4 = px.box(filtered_df1, y='e_coli', title='Box plot - Distribuição de valores de E. Coli')
+    graph4 = px.violin(filtered_df1, y='e_coli', title='Violin Plot - Distribuição de valores de E. Coli')
     
-    graph6 = px.line(filtered_df1, x='dateTime', y='e_coli', hover_data=df.columns,
-                     title='Série temporal de valores de E. Coli')
+    graph6 = px.box(filtered_df1, y='e_coli', title='Box plot - Distribuição de valores de E. Coli')
+    
+    graph8 = px.line(filtered_df1, x='dateTime', y='e_coli', hover_data=df.columns,
+                     title='Time Series - Valores de E. Coli')
 
-    return graph2, graph4, graph6
+    return graph2, graph4, graph6, graph8
 
 if __name__ == '__main__':
     app.run_server(debug=True)
