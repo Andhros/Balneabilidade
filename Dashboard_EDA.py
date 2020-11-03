@@ -45,12 +45,12 @@ app.layout = html.Div([
     
     html.Div([
         html.Div([
-            dcc.Markdown('''###### Selecione um ponto'''), 
+            dcc.Markdown('''###### Ponto de monitoramento'''), 
             dcc.Dropdown(
                 id='drop_ponto1',
                 options=[{'label': i, 'value': i} for i in pontos],
             ),
-            dcc.Markdown('''###### Selecione um ano'''),
+            dcc.Markdown('''###### Ano'''),
             dcc.Dropdown(
                 id='drop_years1',
                 options=[{'label': i, 'value': i} for i in years],
@@ -61,12 +61,12 @@ app.layout = html.Div([
             dcc.Graph(id='graph5'),
         ], className='six columns'),
         html.Div([
-            dcc.Markdown('''###### Selecione um ponto'''), 
+            dcc.Markdown('''###### Ponto de monitoramento'''), 
             dcc.Dropdown(
                 id='drop_ponto2',
                 options=[{'label': i, 'value': i} for i in pontos],
             ),
-            dcc.Markdown('''###### Selecione um ano'''),
+            dcc.Markdown('''###### Ano'''),
              dcc.Dropdown(
                 id='drop_years2',
                 options=[{'label': i, 'value': i} for i in years],
@@ -97,11 +97,13 @@ def update_graph(pointN, yearsN):
         filtered_df = df[(df.ponto == pointN) & (df.dateTime.dt.year == yearsN)].sort_values(by='dateTime')
         
     graph1 = px.histogram(filtered_df, x="e_coli", marginal="rug",
-                          histnorm='percent', range_x=[0, 25000], nbins=25)
+                          histnorm='percent', range_x=[0, 25000], nbins=25, 
+                          title='Histograma - Porcentagem de medições x valores para E. Coli')
     
-    graph3 = px.box(filtered_df, y='e_coli')
+    graph3 = px.box(filtered_df, y='e_coli', title='Box plot - Distribuição de valores de E. Coli')
         
-    graph5 = px.line(filtered_df, x='dateTime', y='e_coli', hover_data=df.columns)
+    graph5 = px.line(filtered_df, x='dateTime', y='e_coli', hover_data=df.columns,
+                     title='Série temporal de valores de E. Coli')
     
         
     return graph1, graph3, graph5
@@ -122,11 +124,13 @@ def update_graph2(pointN2, yearsN2):
         filtered_df1 = df[(df.ponto == pointN2) & (df.dateTime.dt.year == yearsN2)].sort_values(by='dateTime')
 
     graph2 = px.histogram(filtered_df1, x="e_coli", marginal="rug",
-                          histnorm='percent', range_x=[0, 25000], nbins=25)
+                          histnorm='percent', range_x=[0, 25000], nbins=25,
+                          title='Histograma - Porcentagem de medições x valores para E. Coli')
     
-    graph4 = px.box(filtered_df1, y='e_coli')
+    graph4 = px.box(filtered_df1, y='e_coli', title='Box plot - Distribuição de valores de E. Coli')
     
-    graph6 = px.line(filtered_df1, x='dateTime', y='e_coli', hover_data=df.columns)
+    graph6 = px.line(filtered_df1, x='dateTime', y='e_coli', hover_data=df.columns,
+                     title='Série temporal de valores de E. Coli')
 
     return graph2, graph4, graph6
 
