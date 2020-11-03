@@ -9,7 +9,7 @@ df = pd.read_csv('df.csv', sep=';', index_col=0, parse_dates=['dateTime'])
 
 # renames the columns for better manipulation of the dataframe
 df.rename(columns={'Vento': 'vento', 'Maré': 'mare', 'Chuva': 'chuva', 
-                   'Agua (Cº)': 'temp_agua', 'Ar (Cº)': 'temp_ar', 'E.Coli NMP*/100ml': 'e_coli'}, inplace=True)
+                   'Agua (Cº)': 'temp_agua', 'Ar (Cº)': 'temp_ar', 'E.Coli NMP*/100ml': 'e_coli', 'Condição': 'condicao'}, inplace=True)
 
 features_pontos = pd.read_excel('features_pontos.xlsx')
 
@@ -20,6 +20,12 @@ mapa = px.scatter_mapbox(
 years = list(df.dateTime.dt.year.unique())
 years.append('Todos os anos')
 pontos = list(df.ponto.sort_values().unique())
+stats_list = ['Estatísticas de E. Coli por ponto']
+
+#-----------------------------------------------------------------------------
+### Summary Stats
+
+summary_stats = df.groupby('ponto')['e_coli'].agg(['mean', 'median', 'var', 'std']).reset_index()
 
 #-----------------------------------------------------------------------------
 ### Dashboard
@@ -28,6 +34,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
+import dash_table
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets) 
@@ -68,7 +75,7 @@ app.layout = html.Div([
                 options=[{'label': i, 'value': i} for i in pontos],
             ),
             dcc.Markdown('''###### Ano'''),
-             dcc.Dropdown(
+            dcc.Dropdown(
                 id='drop_years2',
                 options=[{'label': i, 'value': i} for i in years],
                 value='Todos os anos'
@@ -78,6 +85,24 @@ app.layout = html.Div([
             dcc.Graph(id='graph6'),
             dcc.Graph(id='graph8'),
         ], className='six columns'),
+    ]),
+    
+    html.Div([
+        html.H4(
+            children='Tabelas Estatísticas',
+            style={
+                'textAlign' : 'center',
+            }
+        ),
+        dcc.Dropdown(
+            id='drop_stats',
+            options=[{'label': i, 'value': i} for i in stats_list],
+            value='Estatísticas de E. Coli por ponto',
+        ),
+        dash_table.DataTable(
+            id='table',
+            data=[],
+            ),
     ]),
 
 ])
@@ -141,6 +166,22 @@ def update_graph2(pointN2, yearsN2):
                      title='Time Series - Valores de E. Coli')
 
     return graph2, graph4, graph6, graph8
+
+
+@app.callback(
+    [dash.dependencies.Output('table', 'data'),
+     dash.dependencies.Output('table', 'columns')],
+    [dash.dependencies.Input('drop_stats', 'value')],
+)
+
+def update_stats_table(df):
+    if df == 'Estatísticas de E. Coli por ponto':
+        table = summary_stats
+        columns = [{"name": i, "id": i} for i in table.columns]
+        data = table.to_dict('rows')
+    
+    return data, columns
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
