@@ -20,12 +20,34 @@ mapa = px.scatter_mapbox(
 years = list(df.dateTime.dt.year.unique())
 years.append('Todos os anos')
 pontos = list(df.ponto.sort_values().unique())
-stats_list = ['Estatísticas de E. Coli por ponto']
+stats_list = ['Descrição sumarizada dos dados (df.describe())', 'Estatísticas de E. Coli por ponto', 
+              'Condição de Balneabilidade por ponto', 'Estatísticas de E. Coli com relação à pluviosidade', 
+              'Estatísticas de E. Coli por praias e pontos com desembocadura', 'Estatísticas de E. Coli por ano',
+              'Estatísticas de E. Coli por mês']
 
 #-----------------------------------------------------------------------------
 ### Summary Stats
 
-summary_stats = df.groupby('ponto')['e_coli'].agg(['mean', 'median', 'var', 'std']).reset_index()
+describe = df.describe().reset_index()
+
+summary_stats_ponto = df.groupby('ponto').agg({'dateTime': 'count', 'e_coli': ['mean', 'median', 'var', 'std']}).reset_index()
+summary_stats_ponto.columns = summary_stats_ponto.columns.droplevel()
+
+cross_condit = pd.crosstab(df.ponto, df.condicao, margins=True, margins_name='Total de medições').reset_index()
+cross_condit['Porcentagem Imprópria'] = cross_condit['IMPRÓPRIA'] / cross_condit['Total de medições'] * 100
+cross_condit['Porcentagem Própria'] = cross_condit['PRÓPRIA'] / cross_condit['Total de medições'] * 100
+cross_condit['Porcentagem Indeterminado'] = cross_condit['INDETERMINADO'] / cross_condit['Total de medições'] * 100
+cross_condit
+
+summary_stats_chuva = df.groupby('chuva')['e_coli'].agg(['mean', 'median', 'var', 'std']).reset_index()
+
+summary_stats_desemb = df.groupby(['agua_doce', 'desembocadura_praia', 'ponto_perto_desembocadura'])['e_coli'].agg(['mean', 'median', 'var', 'std']).reset_index()
+
+summary_stats_year = df.groupby(df.dateTime.dt.year).agg({'dateTime': 'count', 'e_coli': ['mean', 'median', 'var', 'std']}).reset_index()
+summary_stats_year.columns = summary_stats_year.columns.droplevel()
+
+summary_stats_month = df.groupby(df.dateTime.dt.month).agg({'dateTime': 'count', 'e_coli': ['mean', 'median', 'var', 'std']}).reset_index()
+summary_stats_month.columns = summary_stats_month.columns.droplevel()
 
 #-----------------------------------------------------------------------------
 ### Dashboard
@@ -97,7 +119,6 @@ app.layout = html.Div([
         dcc.Dropdown(
             id='drop_stats',
             options=[{'label': i, 'value': i} for i in stats_list],
-            value='Estatísticas de E. Coli por ponto',
         ),
         dash_table.DataTable(
             id='table',
@@ -175,8 +196,43 @@ def update_graph2(pointN2, yearsN2):
 )
 
 def update_stats_table(df):
-    if df == 'Estatísticas de E. Coli por ponto':
-        table = summary_stats
+    
+    if df is None:
+        columns = []
+        data = []
+    
+    elif df == 'Descrição sumarizada dos dados (df.describe())':
+        table = describe
+        columns = [{"name": i, "id": i} for i in table.columns]
+        data = table.to_dict('rows')
+    
+    elif df == 'Estatísticas de E. Coli por ponto':
+        table = summary_stats_ponto
+        columns = [{"name": i, "id": i} for i in table.columns]
+        data = table.to_dict('rows')
+        
+    elif df == 'Condição de Balneabilidade por ponto':
+        table = cross_condit
+        columns = [{"name": i, "id": i} for i in table.columns]
+        data = table.to_dict('rows')
+        
+    elif df == 'Estatísticas de E. Coli com relação à pluviosidade':
+        table = summary_stats_chuva
+        columns = [{"name": i, "id": i} for i in table.columns]
+        data = table.to_dict('rows')
+    
+    elif df == 'Estatísticas de E. Coli por praias e pontos com desembocadura':
+        table = summary_stats_desemb
+        columns = [{"name": i, "id": i} for i in table.columns]
+        data = table.to_dict('rows')
+    
+    elif df == 'Estatísticas de E. Coli por ano':
+        table = summary_stats_year
+        columns = [{"name": i, "id": i} for i in table.columns]
+        data = table.to_dict('rows')
+    
+    elif df == 'Estatísticas de E. Coli por mês':
+        table = summary_stats_month
         columns = [{"name": i, "id": i} for i in table.columns]
         data = table.to_dict('rows')
     
