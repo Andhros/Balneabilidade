@@ -122,6 +122,7 @@ app.layout = html.Div([
         ),
         dash_table.DataTable(
             id='table',
+            page_size=10,
             data=[],
             ),
     ]),
