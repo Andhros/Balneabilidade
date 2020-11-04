@@ -2,9 +2,9 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import plotly.express as px
+import plotly.graph_objs as go
 import plotly.figure_factory as ff
-import pylab 
-import scipy.stats as stats
+
 
 # reads the csv and parses the dateTime column
 df = pd.read_csv('df.csv', sep=';', index_col=0, parse_dates=['dateTime'])
@@ -128,7 +128,31 @@ app.layout = html.Div([
             id='table',
             page_size=10,
             data=[],
-            ),
+        ),
+        html.H1(
+            children='__________________________________________',
+            style={
+                'textAlign' : 'center',
+            }
+        ),
+        html.H6(
+            children='Dados retirados de: https://balneabilidade.ima.sc.gov.br/',
+            style={
+                'textAlign' : 'center',
+            }
+        ),
+        html.H6(
+            children='Criado por: Andhros Guimarães e David Guimarães',
+            style={
+                'textAlign' : 'center',
+            }
+        ),
+        html.H1(
+            children='-----------------------------------------',
+            style={
+                'textAlign' : 'center',
+            }
+        ),
     ]),
 
 ])
