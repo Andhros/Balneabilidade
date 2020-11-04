@@ -3,6 +3,8 @@ import numpy as np
 import seaborn as sns
 import plotly.express as px
 import plotly.figure_factory as ff
+import pylab 
+import scipy.stats as stats
 
 # reads the csv and parses the dateTime column
 df = pd.read_csv('df.csv', sep=';', index_col=0, parse_dates=['dateTime'])
@@ -89,6 +91,7 @@ app.layout = html.Div([
             dcc.Graph(id='graph3'),
             dcc.Graph(id='graph5'),
             dcc.Graph(id='graph7'),
+            dcc.Graph(id='graph9'),
         ], className='six columns'),
         html.Div([
             dcc.Markdown('''###### Ponto de monitoramento'''), 
@@ -106,6 +109,7 @@ app.layout = html.Div([
             dcc.Graph(id='graph4'),
             dcc.Graph(id='graph6'),
             dcc.Graph(id='graph8'),
+            dcc.Graph(id='graph10'),
         ], className='six columns'),
     ]),
     
@@ -157,7 +161,6 @@ def update_graph(pointN, yearsN):
     graph7 = px.line(filtered_df, x='dateTime', y='e_coli', hover_data=df.columns,
                      title='Time Series - Valores de E. Coli')
     
-        
     return graph1, graph3, graph5, graph7
 
 @app.callback(
