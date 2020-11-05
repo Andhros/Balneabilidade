@@ -91,7 +91,6 @@ app.layout = html.Div([
             dcc.Graph(id='graph3'),
             dcc.Graph(id='graph5'),
             dcc.Graph(id='graph7'),
-            dcc.Graph(id='graph9'),
         ], className='six columns'),
         html.Div([
             dcc.Markdown('''###### Ponto de monitoramento'''), 
@@ -109,7 +108,6 @@ app.layout = html.Div([
             dcc.Graph(id='graph4'),
             dcc.Graph(id='graph6'),
             dcc.Graph(id='graph8'),
-            dcc.Graph(id='graph10'),
         ], className='six columns'),
     ]),
     
