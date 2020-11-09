@@ -6,50 +6,46 @@ import plotly.graph_objs as go
 import plotly.figure_factory as ff
 
 
-# reads the csv and parses the dateTime column
+# lê o csv e faz o parse da coluna dateTime
 df = pd.read_csv('df.csv', sep=';', index_col=0, parse_dates=['dateTime'])
 
-# renames the columns for better manipulation of the dataframe
-df.rename(columns={'Vento': 'vento', 'Maré': 'mare', 'Chuva': 'chuva', 
-                   'Agua (Cº)': 'temp_agua', 'Ar (Cº)': 'temp_ar', 'E.Coli NMP*/100ml': 'e_coli', 'Condição': 'condicao'}, inplace=True)
-
-features_pontos = pd.read_excel('features_pontos.xlsx')
+atributos_pontos = pd.read_excel('atributos_pontos.xlsx')
 
 mapa = px.scatter_mapbox(
-    features_pontos, lat='lat', lon='long', hover_data=['id', 'nome', 'referencia', 'localizacao', 'agua_doce', 'desembocadura_praia', 'ponto_perto_desembocadura'], 
+    atributos_pontos, lat='lat', lon='long', hover_data=['ponto', 'balneario', 'referencia', 'localizacao', 'agua_doce', 'desembocadura_praia', 'ponto_perto_desembocadura'], 
     mapbox_style='carto-positron', center={"lat": -27.61587, "lon": -48.48378}, zoom=8)
 
-years = list(df.dateTime.dt.year.unique())
-years.append('Todos os anos')
+anos = list(df.dateTime.dt.year.unique())
+anos.append('Todos os anos')
 pontos = list(df.ponto.sort_values().unique())
-stats_list = ['Descrição sumarizada dos dados (df.describe())', 'Estatísticas de E. Coli por ponto', 
+estats_lista = ['Descrição sumarizada dos dados (df.describe())', 'Estatísticas de E. Coli por ponto', 
               'Condição de Balneabilidade por ponto', 'Estatísticas de E. Coli com relação à pluviosidade', 
               'Estatísticas de E. Coli por praias e pontos com desembocadura', 'Estatísticas de E. Coli por ano',
               'Estatísticas de E. Coli por mês']
 
 #-----------------------------------------------------------------------------
-### Summary Stats
+### Tabelas estatísticas
 
-describe = df.describe().reset_index()
+descricao = df.describe().reset_index()
 
-summary_stats_ponto = df.groupby('ponto').agg({'dateTime': 'count', 'e_coli': ['mean', 'median', 'var', 'std']}).reset_index()
-summary_stats_ponto.columns = summary_stats_ponto.columns.droplevel()
+estats_ponto = df.groupby('ponto').agg({'dateTime': 'count', 'e_coli': ['mean', 'median', 'var', 'std']}).reset_index()
+estats_ponto.columns = estats_ponto.columns.droplevel()
 
-cross_condit = pd.crosstab(df.ponto, df.condicao, margins=True, margins_name='Total de medições').reset_index()
-cross_condit['Porcentagem Imprópria'] = cross_condit['IMPRÓPRIA'] / cross_condit['Total de medições'] * 100
-cross_condit['Porcentagem Própria'] = cross_condit['PRÓPRIA'] / cross_condit['Total de medições'] * 100
-cross_condit['Porcentagem Indeterminado'] = cross_condit['INDETERMINADO'] / cross_condit['Total de medições'] * 100
-cross_condit
+cross_condicao = pd.crosstab(df.ponto, df.condicao, margins=True, margins_name='Total de medições').reset_index()
+cross_condicao['Porcentagem Imprópria'] = cross_condicao['IMPRÓPRIA'] / cross_condicao['Total de medições'] * 100
+cross_condicao['Porcentagem Própria'] = cross_condicao['PRÓPRIA'] / cross_condicao['Total de medições'] * 100
+cross_condicao['Porcentagem Indeterminado'] = cross_condicao['INDETERMINADO'] / cross_condicao['Total de medições'] * 100
+cross_condicao
 
-summary_stats_chuva = df.groupby('chuva')['e_coli'].agg(['mean', 'median', 'var', 'std']).reset_index()
+estats_chuva = df.groupby('chuva')['e_coli'].agg(['mean', 'median', 'var', 'std']).reset_index()
 
-summary_stats_desemb = df.groupby(['agua_doce', 'desembocadura_praia', 'ponto_perto_desembocadura'])['e_coli'].agg(['mean', 'median', 'var', 'std']).reset_index()
+estats_desmb = df.groupby(['agua_doce', 'desembocadura_praia', 'ponto_perto_desembocadura'])['e_coli'].agg(['mean', 'median', 'var', 'std']).reset_index()
 
-summary_stats_year = df.groupby(df.dateTime.dt.year).agg({'dateTime': 'count', 'e_coli': ['mean', 'median', 'var', 'std']}).reset_index()
-summary_stats_year.columns = summary_stats_year.columns.droplevel()
+estats_anos = df.groupby(df.dateTime.dt.year).agg({'dateTime': 'count', 'e_coli': ['mean', 'median', 'var', 'std']}).reset_index()
+estats_anos.columns = estats_anos.columns.droplevel()
 
-summary_stats_month = df.groupby(df.dateTime.dt.month).agg({'dateTime': 'count', 'e_coli': ['mean', 'median', 'var', 'std']}).reset_index()
-summary_stats_month.columns = summary_stats_month.columns.droplevel()
+estats_meses = df.groupby(df.dateTime.dt.month).agg({'dateTime': 'count', 'e_coli': ['mean', 'median', 'var', 'std']}).reset_index()
+estats_meses.columns = estats_meses.columns.droplevel()
 
 #-----------------------------------------------------------------------------
 ### Dashboard
@@ -83,8 +79,8 @@ app.layout = html.Div([
             ),
             dcc.Markdown('''###### Ano'''),
             dcc.Dropdown(
-                id='drop_years1',
-                options=[{'label': i, 'value': i} for i in years],
+                id='drop_anos1',
+                options=[{'label': i, 'value': i} for i in anos],
                 value='Todos os anos'
             ),
             dcc.Graph(id='graph1'),
@@ -100,8 +96,8 @@ app.layout = html.Div([
             ),
             dcc.Markdown('''###### Ano'''),
             dcc.Dropdown(
-                id='drop_years2',
-                options=[{'label': i, 'value': i} for i in years],
+                id='drop_anos2',
+                options=[{'label': i, 'value': i} for i in anos],
                 value='Todos os anos'
             ),
             dcc.Graph(id='graph2'),
@@ -119,8 +115,8 @@ app.layout = html.Div([
             }
         ),
         dcc.Dropdown(
-            id='drop_stats',
-            options=[{'label': i, 'value': i} for i in stats_list],
+            id='drop_estats',
+            options=[{'label': i, 'value': i} for i in estats_lista],
         ),
         dash_table.DataTable(
             id='table',
@@ -161,7 +157,7 @@ app.layout = html.Div([
     dash.dependencies.Output('graph5', 'figure'),
     dash.dependencies.Output('graph7', 'figure')],
     [dash.dependencies.Input('drop_ponto1', 'value'),
-    dash.dependencies.Input('drop_years1', 'value')]
+    dash.dependencies.Input('drop_anos1', 'value')]
 )
 
 def update_graph(pointN, yearsN):
@@ -191,7 +187,7 @@ def update_graph(pointN, yearsN):
     dash.dependencies.Output('graph6', 'figure'),
     dash.dependencies.Output('graph8', 'figure')],
     [dash.dependencies.Input('drop_ponto2', 'value'),
-    dash.dependencies.Input('drop_years2', 'value')]
+    dash.dependencies.Input('drop_anos2', 'value')]
 )
 
 def update_graph2(pointN2, yearsN2):
@@ -218,7 +214,7 @@ def update_graph2(pointN2, yearsN2):
 @app.callback(
     [dash.dependencies.Output('table', 'data'),
      dash.dependencies.Output('table', 'columns')],
-    [dash.dependencies.Input('drop_stats', 'value')],
+    [dash.dependencies.Input('drop_estats', 'value')],
 )
 
 def update_stats_table(df):
@@ -228,37 +224,37 @@ def update_stats_table(df):
         data = []
     
     elif df == 'Descrição sumarizada dos dados (df.describe())':
-        table = describe
+        table = descricao
         columns = [{"name": i, "id": i} for i in table.columns]
         data = table.to_dict('rows')
     
     elif df == 'Estatísticas de E. Coli por ponto':
-        table = summary_stats_ponto
+        table = estats_ponto
         columns = [{"name": i, "id": i} for i in table.columns]
         data = table.to_dict('rows')
         
     elif df == 'Condição de Balneabilidade por ponto':
-        table = cross_condit
+        table = cross_condicao
         columns = [{"name": i, "id": i} for i in table.columns]
         data = table.to_dict('rows')
         
     elif df == 'Estatísticas de E. Coli com relação à pluviosidade':
-        table = summary_stats_chuva
+        table = estats_chuva
         columns = [{"name": i, "id": i} for i in table.columns]
         data = table.to_dict('rows')
     
     elif df == 'Estatísticas de E. Coli por praias e pontos com desembocadura':
-        table = summary_stats_desemb
+        table = estats_desmb
         columns = [{"name": i, "id": i} for i in table.columns]
         data = table.to_dict('rows')
     
     elif df == 'Estatísticas de E. Coli por ano':
-        table = summary_stats_year
+        table = estats_anos
         columns = [{"name": i, "id": i} for i in table.columns]
         data = table.to_dict('rows')
     
     elif df == 'Estatísticas de E. Coli por mês':
-        table = summary_stats_month
+        table = estats_meses
         columns = [{"name": i, "id": i} for i in table.columns]
         data = table.to_dict('rows')
     
