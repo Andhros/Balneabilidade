@@ -6,23 +6,23 @@ import json
 import functools
 import operator
 
-# requests urls
+# urls de resquest
 url_municipios = 'https://balneabilidade.ima.sc.gov.br/municipio/getMunicipios'
 url_locais = 'https://balneabilidade.ima.sc.gov.br/local/getLocaisByMunicipio'
 url_anos = 'https://balneabilidade.ima.sc.gov.br/registro/anosAnalisados'
 url_dados = 'https://balneabilidade.ima.sc.gov.br/relatorio/historico'
 
-url_list =[url_municipios, url_locais, url_anos, url_dados]
+url_lista =[url_municipios, url_locais, url_anos, url_dados]
 
-# extract the list of years -> used to do one request per year
+# extrai a lista de anos
 anos = json.loads(requests.get(url_anos).text)
 anos = [i['ANO'] for i in anos]
 
-# makes one request per year (using url_dados) 
-# all the monitoring points ('localID' : 0) in Florianopólis city ('municipioID' : 2)
-print('Request Loop Started')
+# faz um resquest por ano 
+# todos os pontos de monitoramento ('localID' : 0) em Florianópolis ('municipioID' : 2)
+print('Loop de requests iniciado')
 ti = time.time()
-list_req = [requests.post(url_dados,
+lista_rqs = [requests.post(url_dados,
                           data={
                               "municipioID": 2,
                               "localID": 0,
@@ -30,89 +30,89 @@ list_req = [requests.post(url_dados,
                               "redirect": True
                           }) for i in anos]
 tf = time.time()
-print([i.status_code == 200 for i in list_req])
+print([i.status_code == 200 for i in lista_rqs])
 print()
-print('Request Loop Finished in',tf-ti, 'seconds')
+print('Loop de requests finalizado',tf-ti, 'segundos')
 
-# creates empty lists to store the dataframes 
-# 'lugares' -> details of locations of the monitorint points / 'dados' -> data of interest
+# cria listas vazias para armazenar os dataframes
+# 'lugares' -> detalhes de localização dos pontos / 'dados' -> dados de interesse
 lugares = []
 dados = []
 
 
 print()
-print('For Loop Started')
+print('For loop iniciado')
 ti2 = time.time()
 
-# iterates over the results returned for each year
-for i in list_req: 
+# iterates sobre os resultados de cada ano
+for i in lista_rqs: 
 
-    # reads the html and puts the tables in dataframes
-    rawdata = pd.read_html(i.text)
+    # lê o html e coloca as tabelas em dataframes
+    dados_brutos = pd.read_html(i.text)
 
-    # the first dataframe for each year has no use
-    rawdata.pop(0)
+    # o primeiro dataframe para cada ano não tem utilidade (é somente um cabeçalho)
+    dados_brutos.pop(0)
 
-    # the dataframes alternate between location details and monitoring data
-    # subsets the result for dataframes with location details 
-    infodf = rawdata[0:(len(rawdata)+1):2]
+    # os dataframes se alternam entre os detalhes de localização e os dados do ponto
+    # seleciona os dataframes com detalhes de localização dos pontos 
+    infodf = dados_brutos[0:(len(dados_brutos)+1):2]
 
-    # subsets the result for dataframes with the monitoring data
-    listdf = rawdata[1:(len(rawdata)+1):2]
+    # seleciona os dataframes com dados de interesse dos pontos
+    listadf = dados_brutos[1:(len(dados_brutos)+1):2]
 
-    # extracts and wrangle the details of the location into the correct dataframe format
+    # extraí e compila os detalhes de localização em um dataframe organizado
     infodf_new = []
-    for i, j in zip (infodf, listdf):
+    for i, j in zip (infodf, listadf):
         # for the info df, attain the point number:
         j['ponto'] = i.iloc[1, 0].lower().strip('ponto de coleta: ponto ')
         
-        # transform every info df column-wise
-        infodf_added = pd.DataFrame(
+        # transformação de colunas
+        infodf_adic = pd.DataFrame(
                     {'municipio': i.iloc[0,0].lower().replace('município: ', ''),
                     'balneario': i.iloc[0,1].lower().replace('balneário: ', ''),
                     'ponto': i.iloc[1,0].lower().replace('ponto de coleta: ponto ', ''),
                     'localizacao': i.iloc[1,1].lower().replace('localização: ', '')}, index=[0]
                 )
-        # create appended list of df
-        infodf_new.append(infodf_added)
+        # adiciona o df e adiciona a lista info novo df
+        infodf_new.append(infodf_adic)
 
-    # creates one dataframe with the location details of all points monitored in a year
+    # cria um dataframe com os detalhes de localização de todos pontos monitorados
     locais = pd.concat(infodf_new)
     locais.reset_index(drop=True, inplace=True)
 
-    # crates one dataframe with the data from all the points monitored in a year 
-    df = pd.concat(listdf)
+    # cria um dataframe com os dados de interesse de todos os pontos monitorados 
+    df = pd.concat(listadf)
     df.reset_index(drop=True, inplace=True)
 
-    # append to the corresponding list of dataframes
+    # adiciona os dataframes as listas correspondentes
     lugares.append(locais)
     dados.append(df)
 tf2 = time.time()
 print()
-print('For Loop Finished in', tf2-ti2, 'seconds')
+print('For Loop finalizado', tf2-ti2, 'segundos')
 
-# concats the data frames for each year into a single df (location details)
-spots = pd.concat(lugares).reset_index(drop=True)
-spots = spots.drop_duplicates(subset='ponto', keep='first').reset_index(drop=True)
+# concatena os dataframes de cada ano em um único df (detalhes de localização)
+localiz = pd.concat(lugares).reset_index(drop=True)
+localiz = localiz.drop_duplicates(subset='ponto', keep='first').reset_index(drop=True)
 
-# concats the data frames for each year into a single df (monitoring data)
+# concatena os dataframes de cada ano em um único df (dados de interesse)
 df = pd.concat(dados).reset_index(drop=True)
 
-# there are a lot of missing values in the 'hour' column
-# fill the na values with a "reasonable" hour, as the samples are taken in the morning
+# existem muitos valores faltantes na coluna de hora
+# preenche os valores faltantes com uma hora "razoável", uma vez que as amostras são coletadas pela manhã
 df['Hora'].fillna('09:30:00', inplace=True)
 
-# replaces a cell where hora is wrong ('92:07:00')
-df.Hora[df.Hora == '92:07:00'] = '09:30:00'
+# substituí uma célula onde a hora tem um valor impossível('92:07:00')
+df.loc[df['Hora'] == '92:07:00', ['Hora']] = '09:30:00'
 
-# gets the date and hour columns and defines a datetime column
+# pega as colunas de data e hora e cria uma coluna de dateTime
 df['dateTime'] = pd.to_datetime(df.Data + ' ' + df.Hora)
 
-# drops the old date and hour columns
+# remove as colunas de data e hora
 df.drop(columns=['Data', 'Hora'], inplace=True)
 
-# the columns with air and wates temperatures contain symbols that need to be removed
-# removes the symbols and tranforms the columns into type float
+# as colunas de temperatura da água e do ar contém símbolos que necessitam ser removidos
+# remove os símbolos e transforma as colunas para tipo float
 def transform_colT(coluna):
     df[coluna] = df[coluna].apply(lambda x: x.replace(' Cº', ''))
     df[coluna] = df[coluna].apply(lambda x: x.replace('Cº', ''))
@@ -123,25 +123,25 @@ def transform_colT(coluna):
 df['Agua (Cº)'] = transform_colT('Agua (Cº)')
 df['Ar (Cº)'] = transform_colT('Ar (Cº)')
 
-# converts the rest of the columns to the right types
+# converte o resto das colunas para os tipos corretos de dados
 df['ponto'] = df['ponto'].astype('int')
 df['Condição'] = df['Condição'].astype('category')
 df['Vento'] = df['Vento'].astype('category')
 df['Maré'] = df['Maré'].astype('category')
 df['Chuva'] = df['Chuva'].astype('category')
 
-# Reorder columns
+# reordena as colunas
 cols = ['dateTime', 'ponto', 'Vento', 'Maré', 'Chuva', 'Agua (Cº)', 'Ar (Cº)', 'E.Coli NMP*/100ml', 'Condição']
 df = df[cols]
 
+# renomeia as colunas para facilitar manipulação
 df.rename(columns={'Vento': 'vento', 'Maré': 'mare', 'Chuva': 'chuva', 
                    'Agua (Cº)': 'temp_agua', 'Ar (Cº)': 'temp_ar', 'E.Coli NMP*/100ml': 'e_coli', 'Condição': 'condicao'}, inplace=True)
 
-# some features of each point of monitoring were gathered manually
-# this loads this features into a df
+# tabela contendo os atributos coletados de forma manual
 atributos_pontos = pd.read_excel('atributos_pontos.xlsx')
 
-# adds the corresponding features to each point of monitoring
+# adiciona os atributos correspondentes fazendo a junção dos dois dataframes
 df = df.merge(atributos_pontos, left_on='ponto', right_on='ponto')
 
 df.to_csv('df.csv', sep=';')
