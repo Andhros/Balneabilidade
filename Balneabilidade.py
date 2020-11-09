@@ -99,29 +99,11 @@ spots = spots.drop_duplicates(subset='ponto', keep='first').reset_index(drop=Tru
 df = pd.concat(dados).reset_index(drop=True)
 
 # there are a lot of missing values in the 'hour' column
-# this subsets the df into rows that 'hour is not null'
-# the objective is to get a 'mean' hour to fill the na values later
-mean_hour = df[df['Hora'].notnull()]
+# fill the na values with a "reasonable" hour, as the samples are taken in the morning
+df['Hora'].fillna('09:30:00', inplace=True)
 
-# sets up a moderate value into a row that contained an impossible value ('92:...')
-mean_hour.iloc[7077, 1] = '08:30:00'
-
-# transforms the column into datetime
-mean_hour['Hora'] = pd.to_datetime(mean_hour['Hora'])
-
-# function to get the 'mean' hour
-def avg_datetime(series):
-    dt_min = series.min()
-    deltas = [x-dt_min for x in series]
-    return dt_min + functools.reduce(operator.add, deltas) / len(deltas)
-
-# executes function to get the mean hour    
-mean_h = avg_datetime(mean_hour['Hora'])
-
-# fill the na values with the 'mean' hour
-df['Hora'].fillna('09:41:46', inplace=True)
-
-df.iloc[7077, 1] = '09:41:46'
+# replaces a cell where hora is wrong ('92:07:00')
+df.Hora[df.Hora == '92:07:00'] = '09:30:00'
 
 # gets the date and hour columns and defines a datetime column
 df['dateTime'] = pd.to_datetime(df.Data + ' ' + df.Hora)
@@ -152,14 +134,14 @@ df['Chuva'] = df['Chuva'].astype('category')
 cols = ['dateTime', 'ponto', 'Vento', 'Maré', 'Chuva', 'Agua (Cº)', 'Ar (Cº)', 'E.Coli NMP*/100ml', 'Condição']
 df = df[cols]
 
+df.rename(columns={'Vento': 'vento', 'Maré': 'mare', 'Chuva': 'chuva', 
+                   'Agua (Cº)': 'temp_agua', 'Ar (Cº)': 'temp_ar', 'E.Coli NMP*/100ml': 'e_coli', 'Condição': 'condicao'}, inplace=True)
+
 # some features of each point of monitoring were gathered manually
 # this loads this features into a df
-features_pontos = pd.read_excel('features_pontos.xlsx')
+atributos_pontos = pd.read_excel('atributos_pontos.xlsx')
 
 # adds the corresponding features to each point of monitoring
-df = df.merge(features_pontos, left_on='ponto', right_on='id')
-
-# drops the repetitive column
-df.drop(columns=['id'], inplace=True)
+df = df.merge(atributos_pontos, left_on='ponto', right_on='ponto')
 
 df.to_csv('df.csv', sep=';')
