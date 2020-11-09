@@ -103,7 +103,7 @@ df = pd.concat(data).reset_index(drop=True)
 df['Hora'].fillna('09:30:00', inplace=True)
 
 # replaces a cell where hora is wrong ('92:07:00')
-df.Hora[df.Hora == '92:07:00'] = '09:30:00'
+df.loc[df['Hora'] == '92:07:00', ['Hora']] = '09:30:00'
 
 # gets the date and hour columns and defines a datetime column
 df['dateTime'] = pd.to_datetime(df.Data + ' ' + df.Hora)
@@ -136,7 +136,7 @@ df = df[cols]
 
 # rename columns to english
 df.rename(columns={'ponto': 'point', 'Vento': 'wind', 'Maré': 'tide', 'Chuva': 'rain', 
-                   'Agua (Cº)': 'temp_water', 'Ar (Cº)': 'temp_air', 'E.Coli NMP*/100ml': 'e_coli', 'Condição': 'condition'}, inplace=True)
+                   'Agua (Cº)': 'water_temp', 'Ar (Cº)': 'air_temp', 'E.Coli NMP*/100ml': 'e_coli', 'Condição': 'condition'}, inplace=True)
 
 # some features of each point of monitoring were gathered manually
 # this loads this features into a df

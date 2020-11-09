@@ -9,7 +9,7 @@ import plotly.figure_factory as ff
 # reads the csv and parses the dateTime column
 df = pd.read_csv('df_english.csv', sep=';', index_col=0, parse_dates=['dateTime'])
 
-features_points = pd.read_excel('features_pontos.xlsx')
+features_points = pd.read_excel('features_points.xlsx')
 
 map1 = px.scatter_mapbox(
     features_points, lat='lat', lon='long', hover_data=['point', 'balneary', 'reference', 'location', 'fresh_water', 'drenage_beach', 'drenage_point'], 
@@ -62,7 +62,7 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 app.layout = html.Div([
     html.Div([
         html.H1(
-            children='Balneability Analysis | Florianópolis - SC',
+            children='Balneability Analysis | Florianópolis - SC, Brazil',
             style={
                 'textAlign' : 'center',
             }
@@ -170,7 +170,7 @@ def update_graph(pointN, yearsN):
         
     graph1 = px.histogram(filtered_df, x="e_coli", marginal="rug",
                           histnorm='percent', range_x=[0, 25000], nbins=25, 
-                          title='Histogram - Percentage of measures made x values of E. Coli')
+                          title='Histogram - Percentage of measures x values of E. Coli')
     
     graph3 = px.violin(filtered_df, y='e_coli', title='Violin Plot - Distribution of E. Coli Values')
     
@@ -199,7 +199,7 @@ def update_graph2(pointN2, yearsN2):
 
     graph2 = px.histogram(filtered_df1, x="e_coli", marginal="rug",
                           histnorm='percent', range_x=[0, 25000], nbins=25,
-                          title='Histogram - Percentage of measures made x values of E. Coli')
+                          title='Histogram - Percentage of measures x values of E. Coli')
     
     graph4 = px.violin(filtered_df1, y='e_coli', title='Violin Plot - Distribution of E. Coli Values')
     
